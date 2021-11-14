@@ -18,7 +18,7 @@ export class Recipe extends BaseEntity {
     created_at: Date;
 
     @UpdateDateColumn()
-    updatede_at: Date;
+    updated_at: Date;
 
     @ManyToOne(
         () => User,

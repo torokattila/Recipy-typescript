@@ -1,19 +1,29 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../helpers/AuthContext";
-import Tooltip from "@material-ui/core/Tooltip";
-import "./RecipeCard.css";
+import React, { useContext } from 'react';
+import { AuthContext } from '../helpers/AuthContext';
+import Tooltip from '@material-ui/core/Tooltip';
+import './RecipeCard.css';
 
-function RecipeCard({
-	recipeId,
-	recipeTitle,
-	recipeContent,
-	handleDeleteRecipe,
-	handleOpenRecipeModal
-}) {
+type RecipeCardProps = {
+	recipeId: number;
+	recipeTitle: string;
+	recipeContent: string;
+	handleDeleteRecipe(id: number): void;
+	handleOpenRecipeModal(id: number, title: string, content: string): void;
+};
+
+const RecipeCard = (props: RecipeCardProps): JSX.Element => {
+	const {
+		recipeId,
+		recipeTitle,
+		recipeContent,
+		handleDeleteRecipe,
+		handleOpenRecipeModal
+	} = props;
 	const { pageLanguage } = useContext(AuthContext);
+
 	return (
 		<div className="recipe-card-container">
-			<Tooltip title={pageLanguage === "EN" ? "Delete" : "Törlés"} arrow>
+			<Tooltip title={pageLanguage === 'EN' ? 'Delete' : 'Törlés'} arrow>
 				<button
 					className="delete-recipe-button"
 					onClick={() => {
@@ -43,6 +53,6 @@ function RecipeCard({
 			</div>
 		</div>
 	);
-}
+};
 
 export default RecipeCard;

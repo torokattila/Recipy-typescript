@@ -1,0 +1,39 @@
+import { useContext } from "react";
+import { AuthContext } from "../helpers/AuthContext";
+import { useNavigate } from 'react-router-dom';
+import Swal from "sweetalert2";
+import PageLanguage from '../enums/PageLanguage';
+
+function NavbarContainer() {
+    const { setAuthState, pageLanguage } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const handleLogout = (): void => {
+        Swal.fire({
+            title: pageLanguage === PageLanguage.EN ? 'Are you sure?' : 'Biztos vagy benne?',
+            text: pageLanguage === PageLanguage.EN ? 'Do you want to log out?': 'Biztos ki szeretnél jelentkezni?',
+            showCancelButton: true,
+            cancelButtonText: pageLanguage === PageLanguage.EN ? 'Cancel' : 'Mégse'
+        })
+        .then((response: any) => {
+            if (response.value) {
+                localStorage.removeItem('accessToken');
+                setAuthState({
+                    username: '',
+                    id: 0,
+                    status: false,
+                });
+
+                navigate('/login');
+                window.location.reload();
+            }
+        });
+    }
+
+    return {
+        handleLogout
+    }
+
+}
+
+export default NavbarContainer;

@@ -1,43 +1,58 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../helpers/AuthContext";
-import Tooltip from "@material-ui/core/Tooltip";
-import Modal from "@material-ui/core/Modal";
-import Fade from "@material-ui/core/Fade";
-import Backdrop from "@material-ui/core/Backdrop";
-import { makeStyles } from "@material-ui/core/styles";
-import "./RecipeCard.css";
+import React, { useContext } from 'react';
+import { AuthContext } from '../helpers/AuthContext';
+import Tooltip from '@material-ui/core/Tooltip';
+import Modal from '@material-ui/core/Modal';
+import Fade from '@material-ui/core/Fade';
+import Backdrop from '@material-ui/core/Backdrop';
+import { makeStyles } from '@material-ui/core/styles';
+import './RecipeCard.css';
+import PageLanguage from '../enums/PageLanguage';
 
-function PopupModal({
-	type,
-	recipeTitle,
-	recipeContent,
-	openModal,
-	handleCloseModal,
-	handleSubmitRecipe,
-	setRecipeTitle,
-	setRecipePreparation
-}) {
+type PopupModalProps = {
+	type: string;
+	recipeTitle?: string;
+	recipeContent?: string;
+	openModal: boolean;
+	handleCloseModal(): void;
+	handleSubmitRecipe(): void;
+	setRecipeTitle: React.Dispatch<React.SetStateAction<string>>;
+	setRecipePreparation: React.Dispatch<React.SetStateAction<string>>;
+};
+
+const PopupModal = (props: PopupModalProps) => {
+	const {
+		type,
+		recipeTitle,
+		recipeContent,
+		openModal,
+		handleCloseModal,
+		handleSubmitRecipe,
+		setRecipeTitle,
+		setRecipePreparation
+	} = props;
+
 	const { pageLanguage } = useContext(AuthContext);
+
 	const useStyles = makeStyles(theme => ({
 		modal: {
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "center"
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center'
 		},
 		paper: {
 			backgroundColor: theme.palette.background.paper,
-			border: "none",
+			border: 'none',
 			boxShadow: theme.shadows[5],
 			padding: theme.spacing(2, 4, 3),
 			borderRadius: 20,
-			minWidth: "30vw"
+			minWidth: '30vw'
 		}
 	}));
 	const modalClasses = useStyles();
 	let translatedCreateRecipeTitle =
-		pageLanguage === "EN"
-			? "Create your new recipe"
-			: "Új recept létrehozása";
+		pageLanguage === PageLanguage.EN
+			? 'Create your new recipe'
+			: 'Új recept létrehozása';
 
 	return (
 		<Modal
@@ -55,20 +70,20 @@ function PopupModal({
 			<Fade in={openModal}>
 				<div id="popup-modal" className={modalClasses.paper}>
 					<h2 className="modal-title">
-						{type === "create-form"
+						{type === 'create-form'
 							? translatedCreateRecipeTitle
 							: recipeTitle}
 					</h2>
 
 					<div className="create-recipe-form">
 						<div className="create-recipe-input-container">
-							{type === "create-form"
+							{type === 'create-form'
 								? <input
 										type="text"
 										placeholder={
-											pageLanguage === "EN"
-												? "Recipe title"
-												: "Recept címe"
+											pageLanguage === PageLanguage.EN
+												? 'Recipe title'
+												: 'Recept címe'
 										}
 										className="recipe-title-input"
 										onChange={event =>
@@ -81,13 +96,13 @@ function PopupModal({
 									</div>}
 						</div>
 
-						{type === "create-form" &&
+						{type === 'create-form' &&
 							<div className="create-recipe-input-container">
 								<textarea
 									placeholder={
-										pageLanguage === "EN"
-											? "Preparation"
-											: "Elkészítés"
+										pageLanguage === PageLanguage.EN
+											? 'Preparation'
+											: 'Elkészítés'
 									}
 									className="recipe-preparation-textarea"
 									onChange={event =>
@@ -97,21 +112,23 @@ function PopupModal({
 								/>
 							</div>}
 
-						{type === "create-form" &&
+						{type === 'create-form' &&
 							<div className="create-recipe-button-container">
 								<button
 									className="create-recipe-button"
 									onClick={handleSubmitRecipe}
 								>
-									{pageLanguage === "EN"
-										? "Create"
-										: "Létrehozás"}
+									{pageLanguage === PageLanguage.EN
+										? 'Create'
+										: 'Létrehozás'}
 								</button>
 							</div>}
 					</div>
 
 					<Tooltip
-						title={pageLanguage === "EN" ? "Close" : "Bezár"}
+						title={
+							pageLanguage === PageLanguage.EN ? 'Close' : 'Bezár'
+						}
 						placement="top"
 						arrow
 					>
@@ -126,6 +143,6 @@ function PopupModal({
 			</Fade>
 		</Modal>
 	);
-}
+};
 
 export default PopupModal;

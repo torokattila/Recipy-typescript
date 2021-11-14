@@ -1,15 +1,14 @@
-import React, { useContext } from "react";
-import HomeContainer from "../containers/HomeContainer";
-import Navbar from "../shared/Navbar";
-import Tooltip from "@material-ui/core/Tooltip";
-import RecipeCard from "./RecipeCard";
-import { AuthContext } from "../helpers/AuthContext";
+import React, { useContext } from 'react';
+import HomeContainer from '../containers/HomeContainer';
+import PageLanguage from '../enums/PageLanguage';
+import { AuthContext } from '../helpers/AuthContext';
+import { Recipe } from '../models/Recipe';
+import Tooltip from '@material-ui/core/Tooltip';
+import Navbar from '../shared/Navbar';
+import PopupModal from './PopupModal';
+import RecipeCard from './RecipeCard';
 
-import "./Home.css";
-
-import PopupModal from "./PopupModal";
-
-function Home() {
+function Home(): JSX.Element {
 	const {
 		isCreateRecipeModal,
 		setRecipeTitle,
@@ -19,12 +18,13 @@ function Home() {
 		handleOpenRecipeModal,
 		handleCloseModal,
 		handleSubmitRecipe,
-		userRecipies,
+		userRecipes,
 		handleDeleteRecipe,
 		modalRecipeTitle,
 		modalRecipeContent,
 		handleGetRandomRecipe
 	} = HomeContainer();
+
 	const { authState, pageLanguage } = useContext(AuthContext);
 
 	return (
@@ -33,45 +33,46 @@ function Home() {
 
 			<div className="welcome-message-container">
 				<h3 className="welcome-message">
-					{pageLanguage === "EN" ? "Welcome" : "Szia"}{" "}
+					{pageLanguage === PageLanguage.EN ? 'Welcome' : 'Szia'}{' '}
 					{authState.username}!
 				</h3>
 			</div>
 
-			{userRecipies.length > 0 &&
+			{userRecipes.length > 0 &&
 				<div className="random-recipe-button-container">
 					<button
 						className="random-recipe-button"
 						onClick={handleGetRandomRecipe}
 					>
-						{pageLanguage === "EN"
-							? "what should i cook today?"
-							: "mit főzzek ma?"}
+						{pageLanguage === PageLanguage.EN
+							? 'what should i cook today?'
+							: 'mit főzzek ma?'}
 					</button>
 				</div>}
 
-			{userRecipies.length === 0
+			{userRecipes.length === 0
 				? <div className="no-recipies-title-container">
 						<p>
-							{pageLanguage === "EN"
-								? "Looks like You have no recipies yet."
-								: "Úgy tűnik még nincs egy recepted sem."}
+							{pageLanguage === PageLanguage.EN
+								? 'Looks like You have no recipies yet.'
+								: 'Úgy tűnik még nincs egy recepted sem.'}
 						</p>
+
 						<p>
-							{pageLanguage === "EN"
-								? "Click the + sign on the bottom of the screen to create some!"
-								: "Kattints a + gombra a képernyő alján, hogy létrehozz párat!"}
+							{pageLanguage === PageLanguage.EN
+								? 'Click the + sign on the bottom of the screen to create some!'
+								: 'Kattints a + gombra a képernyő alján, hogy létrehozz párat!'}
 						</p>
 					</div>
 				: <div className="recipies-list-container">
-						{userRecipies.map(recipe => {
+						{userRecipes.map((recipe: Recipe) => {
 							return (
 								<div key={recipe.id}>
 									<RecipeCard
 										recipeId={recipe.id}
 										recipeTitle={recipe.title}
 										recipeContent={recipe.content}
-										handleDeleteRecipe={() => handleDeleteRecipe(recipe.id)}
+										handleDeleteRecipe={handleDeleteRecipe}
 										handleOpenRecipeModal={
 											handleOpenRecipeModal
 										}
@@ -104,9 +105,9 @@ function Home() {
 			<div className="add-recipe-button-container">
 				<Tooltip
 					title={
-						pageLanguage === "EN"
-							? "Add new recipe"
-							: "Recept létrehozása"
+						pageLanguage === 'EN'
+							? 'Add new recipe'
+							: 'Recept létrehozása'
 					}
 					arrow
 				>
