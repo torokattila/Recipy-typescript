@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import Swal from 'sweetalert2';
 import { AuthContext } from '../helpers/AuthContext';
-import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import PageLanguage from '../enums/PageLanguage';
 
 type SignupDataType = {
@@ -20,7 +20,7 @@ const SignupContainer = () => {
 	const [isPassword, setIsPassword] = useState<boolean>(true);
 
 	const { setAuthState, pageLanguage } = useContext(AuthContext);
-	const navigate: NavigateFunction = useNavigate();
+	const history = useHistory();
 
 	const handleSignup = (): void => {
 		const data: SignupDataType = {
@@ -49,7 +49,7 @@ const SignupContainer = () => {
 						status: true
 					});
 
-					navigate('/');
+					history.push('/');
 				}
 			})
 			.catch((error: AxiosError) => {

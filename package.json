@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@types/country-flag-icons": "^1.2.0",
-    "country-flag-icons": "^1.4.14"
-  }
-}

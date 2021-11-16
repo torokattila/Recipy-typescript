@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../helpers/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import NavbarContainer from '../containers/NavbarContainer';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import HomeIcon from '@material-ui/icons/Home';
@@ -8,6 +8,8 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import ExitToAppRounded from '@material-ui/icons/ExitToAppRounded';
 import Tooltip from '@material-ui/core/Tooltip';
 import PageLanguage from '../enums/PageLanguage';
+
+import "./Navbar.css";
 
 function Navbar(): JSX.Element {
 	const { pageLanguage } = useContext(AuthContext);
@@ -17,12 +19,12 @@ function Navbar(): JSX.Element {
 		status: false
 	});
 
-	const navigate = useNavigate();
+	const history = useHistory();
 	const { handleLogout } = NavbarContainer();
 
 	useEffect(() => {
 		if (!localStorage.getItem('accessToken')) {
-			navigate('/login');
+			history.push('/login');
 			window.location.reload();
 		} else {
 			axios
@@ -56,7 +58,7 @@ function Navbar(): JSX.Element {
 					alt="page_logo"
 					className="page-logo"
 					onClick={() => {
-						navigate('/');
+						history.push('/');
 					}}
 				/>
 				<ul>
@@ -72,7 +74,7 @@ function Navbar(): JSX.Element {
 							<HomeIcon
 								className="home-icon"
 								onClick={() => {
-									navigate('/');
+									history.push('/');
 								}}
 							/>
 						</li>
@@ -89,7 +91,7 @@ function Navbar(): JSX.Element {
 						<li>
 							<AccountCircle
 								className="profile-icon"
-								onClick={() => navigate('/profile')}
+								onClick={() => history.push('/profile')}
 							/>
 						</li>
 					</Tooltip>

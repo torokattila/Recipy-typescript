@@ -1,8 +1,10 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Home from './components/Home';
+import Login from './components/Login';
+import Signup from './components/Signup';
 import PageLanguage from './enums/PageLanguage';
 import { AuthContext } from './helpers/AuthContext';
 
@@ -28,8 +30,7 @@ function App(): JSX.Element {
 	useEffect(() => {
 		const returnedLanguage = localStorage.getItem('pageLanguage')!;
 
-    
-    setPageLanguage(returnedLanguage as PageLanguage);
+		setPageLanguage(returnedLanguage as PageLanguage);
 	}, []);
 
 	useEffect(() => {
@@ -61,15 +62,20 @@ function App(): JSX.Element {
 
 	return (
 		<div className="App">
-			<AuthContext.Provider value={{ authState, setAuthState, pageLanguage }}>
-        <Router>
-          <>
-            <Route path='/'>
-              <Home />
-            </Route>
-          </>
-        </Router>
-      </AuthContext.Provider>
+			<AuthContext.Provider
+				value={{ authState, setAuthState, pageLanguage }}
+			>
+				<Router>
+					<Switch>
+						<>
+							<Route exact path='/' component={Home} />
+							{/* <Route exact path='/profile' component={Profile} /> */}
+							<Route exact path='/login' component={Login} />
+							<Route exact path='/signup' component={Signup} />
+						</>
+					</Switch>
+				</Router>
+			</AuthContext.Provider>
 		</div>
 	);
 }

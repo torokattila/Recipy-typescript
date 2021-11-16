@@ -8,6 +8,8 @@ import Navbar from '../shared/Navbar';
 import PopupModal from './PopupModal';
 import RecipeCard from './RecipeCard';
 
+import "./Home.css";
+
 function Home(): JSX.Element {
 	const {
 		isCreateRecipeModal,

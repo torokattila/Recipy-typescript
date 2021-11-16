@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { AuthContext } from "../helpers/AuthContext";
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Swal from "sweetalert2";
 import PageLanguage from '../enums/PageLanguage';
 
 function NavbarContainer() {
     const { setAuthState, pageLanguage } = useContext(AuthContext);
-    const navigate = useNavigate();
+    const history = useHistory();
 
     const handleLogout = (): void => {
         Swal.fire({
@@ -24,7 +24,7 @@ function NavbarContainer() {
                     status: false,
                 });
 
-                navigate('/login');
+                history.push('/login');
                 window.location.reload();
             }
         });

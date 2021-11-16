@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../helpers/AuthContext';
 import { Recipe } from '../models/Recipe';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import PageLanguage from '../enums/PageLanguage';
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -25,7 +25,7 @@ function HomeContainer() {
 	const [recipePreparation, setRecipePreparation] = useState<string>('');
 	const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
 
-	const navigate = useNavigate();
+	const history = useHistory();
 
 	const handleOpenModal = (): void => {
 		setIsCreateRecipeModal(true);
@@ -151,7 +151,7 @@ function HomeContainer() {
 
     const getUserRecipes = (): void => {
         if (!localStorage.getItem('accessToken')) {
-            navigate('/login');
+            history.push('/login');
         } else {
             axios.get('http://localhost:3001/api/getrecipies', {
                 headers: {
@@ -169,7 +169,7 @@ function HomeContainer() {
 
     useEffect(() => {
         getUserRecipes();
-    });
+    }, []);
 
     return {
         recipeModalId,

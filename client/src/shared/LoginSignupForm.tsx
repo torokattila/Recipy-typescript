@@ -1,24 +1,22 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { AuthContext } from '../helpers/AuthContext';
 import IconButton from '@material-ui/core/IconButton';
 import { GoogleLogin, GoogleLoginResponse } from 'react-google-login';
-import {
-	findFlagUrlByNationality,
-	findFlagUrlByCountryName
-} from 'country-flags-svg';
 import '../components/Login.css';
 import SignupContainer from '../containers/SignupContainer';
 import LoginContainer from '../containers/LoginContainer';
 import PageLanguage from '../enums/PageLanguage';
 import { Divider } from '@material-ui/core';
 
-const LoginSignupForm = (pageName: string): JSX.Element => {
+type LoginSignupFormProps = {
+	pageName: string;
+};
+
+const LoginSignupForm = ({ pageName }: LoginSignupFormProps): JSX.Element => {
 	const { pageLanguage } = useContext(AuthContext);
-	const hungarianFlagUrl = findFlagUrlByNationality('Hungarian');
-	const englishFlagUrl = findFlagUrlByCountryName('United Kingdom');
-	const navigate = useNavigate();
+	const history = useHistory();
 
 	const {
 		setSignupUsername,
@@ -51,15 +49,23 @@ const LoginSignupForm = (pageName: string): JSX.Element => {
 				<div>
 					<IconButton
 						onClick={() => {
+							handleChangeLanguage(PageLanguage.EN);
+						}}
+					>
+						<img src="/hu.png" className="flag-icon" />
+					</IconButton>
+
+					<IconButton
+						onClick={() => {
 							handleChangeLanguage(PageLanguage.HU);
 						}}
 					>
-						<img src={hungarianFlagUrl} alt="flag-icon" />
+						<img src="/uk.jpg" className="flag-icon" />
 					</IconButton>
 				</div>
 			</div>
 
-			<div className="login-page-card-container">
+			<div className="login-page-login-card-container">
 				<div className="login-page-card-header-container">
 					<div>
 						<h1>
@@ -164,7 +170,9 @@ const LoginSignupForm = (pageName: string): JSX.Element => {
 
 							<GoogleLogin
 								className="google-login-button"
-								clientId={process.env.REACT_APP_CLIENT_ID as string}
+								clientId={
+									process.env.REACT_APP_CLIENT_ID as string
+								}
 								buttonText={
 									pageLanguage === PageLanguage.EN
 										? 'Sign in'
@@ -176,6 +184,42 @@ const LoginSignupForm = (pageName: string): JSX.Element => {
 							/>
 						</div>}
 				</div>
+
+				{pageName === 'Sign up' || pageName === 'Regisztráció'
+					? <div className="account-question-container">
+							<h4 className="account-question">
+								{pageLanguage === PageLanguage.EN
+									? 'Do you already have an account?'
+									: 'Van már fiókod?'}
+							</h4>
+							<span
+								className="login-signup-link"
+								onClick={() => {
+									history.push('/login');
+								}}
+							>
+								{pageLanguage === 'EN'
+									? 'Sign in'
+									: 'Bejelentkezés'}
+							</span>
+						</div>
+					: <div className="account-question-container">
+							<h4 className="account-question">
+								{pageLanguage === PageLanguage.EN
+									? "Don't you have an account?"
+									: 'Nincs még fiókod?'}
+							</h4>
+							<span
+								className="login-signup-link"
+								onClick={() => {
+									history.push('/signup');
+								}}
+							>
+								{pageLanguage === PageLanguage.EN
+									? 'Sign up'
+									: 'Regisztráció'}
+							</span>
+						</div>}
 			</div>
 		</div>
 	);
