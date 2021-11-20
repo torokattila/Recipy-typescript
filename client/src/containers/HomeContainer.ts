@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../helpers/AuthContext';
 import { Recipe } from '../models/Recipe';
 import { useHistory } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertResult } from 'sweetalert2';
 import PageLanguage from '../enums/PageLanguage';
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { toast } from 'react-toastify';
 
 type SubmitRecipeType = {
 	title: string;
@@ -59,33 +60,36 @@ function HomeContainer() {
 		setOpenModal(false);
 	};
 
-	const handleSubmitRecipe = () => {
-		const data = {
+	const handleSubmitRecipe = async () => {
+		const data: SubmitRecipeType = {
 			title: recipeTitle,
 			preparation: recipePreparation,
 			languageToBackend: pageLanguage
 		};
 
-		axios
+		await axios
 			.post('http://localhost:3001/api/createrecipe', data, {
 				headers: {
 					accessToken: localStorage.getItem('accessToken')!
 				}
 			})
-			.then((response: AxiosResponse) => {
+			.then(async (response: AxiosResponse) => {
 				if (response.data.error) {
-					Swal.fire({
-						title: '',
-						text: response.data.error,
-						type: 'error'
+					toast.error(response.data.error, {
+						theme: 'colored'
 					});
 				} else {
+					toast.success(response.data, {
+						theme: 'colored'
+					});
 					handleCloseModal();
 				}
 			})
 			.catch((error: AxiosError) => {
 				console.log(error);
 			});
+
+		getUserRecipes();
 	};
 
 	const handleDeleteRecipe = (id: number): void => {
@@ -97,11 +101,14 @@ function HomeContainer() {
 			text:
 				pageLanguage === PageLanguage.EN
 					? 'Do you want to delete this recipe?'
-					: 'Biztos törölni szeretnéd ezt a receptet?'
+					: 'Biztos törölni szeretnéd ezt a receptet?',
+			showCancelButton: true,
+			cancelButtonText:
+				pageLanguage === PageLanguage.EN ? 'Cancel' : 'Mégse'
 		})
-			.then((confirmResponse: any) => {
+			.then(async (confirmResponse: SweetAlertResult) => {
 				if (confirmResponse.value) {
-					axios
+					await axios
 						.delete(
 							`http://localhost:3001/api/deleterecipe/${id}`,
 							{
@@ -117,18 +124,13 @@ function HomeContainer() {
 						)
 						.then((response: AxiosResponse) => {
 							if (response.data.error) {
-								console.log(response.data.error);
-
-								Swal.fire({
-									title: '',
-									text: response.data.error,
-									type: 'error'
+								toast.error(response.data.error, {
+									theme: 'colored'
 								});
 							} else {
-								Swal.fire({
-									title: '',
-									text: response.data,
-									type: 'success'
+								getUserRecipes();
+								toast.success(response.data, {
+									theme: 'colored'
 								});
 							}
 						})
@@ -139,40 +141,35 @@ function HomeContainer() {
 			})
 			.catch((error: AxiosError) => {
 				console.log(error);
-				Swal.fire({
-					title: '',
-					text:
-						pageLanguage === PageLanguage.EN
-							? 'There was an error with the delete, try again please!'
-							: 'Hiba adódott a törléssel, kérjük próbálja újra!'
-				});
+				const errorMessage: string =
+					pageLanguage === PageLanguage.EN
+						? 'There was an error with the delete, try again please!'
+						: 'Hiba adódott a törléssel, kérjük próbálja újra!';
+				toast.error(errorMessage, { theme: 'colored' });
 			});
 	};
 
-    const getUserRecipes = (): void => {
-        if (!localStorage.getItem('accessToken')) {
-            history.push('/login');
-        } else {
-            axios.get('http://localhost:3001/api/getrecipies', {
-                headers: {
-                    accessToken: localStorage.getItem('accessToken')!
-                }
-            })
-            .then((response: AxiosResponse) => {
-                setUserRecipes(response.data.recipiesList);
-            })
-            .catch((error: AxiosError) => {
-                console.log(error);
-            });
-        }
-    };
+	const getUserRecipes = async (): Promise<void> => {
+		if (!localStorage.getItem('accessToken')) {
+			history.push('/login');
+		} else {
+			await axios
+				.get('http://localhost:3001/api/getrecipies', {
+					headers: {
+						accessToken: localStorage.getItem('accessToken')!
+					}
+				})
+				.then((response: AxiosResponse) => {
+					setUserRecipes(response.data.recipiesList);
+				})
+				.catch((error: AxiosError) => {
+					console.log(error);
+				});
+		}
+	};
 
-    useEffect(() => {
-        getUserRecipes();
-    }, []);
-
-    return {
-        recipeModalId,
+	return {
+		recipeModalId,
 		setRecipeTitle,
 		setRecipePreparation,
 		openModal,
@@ -185,8 +182,9 @@ function HomeContainer() {
 		handleDeleteRecipe,
 		modalRecipeTitle,
 		modalRecipeContent,
-		handleGetRandomRecipe
-    }
+		handleGetRandomRecipe,
+		getUserRecipes
+	};
 }
 
 export default HomeContainer;

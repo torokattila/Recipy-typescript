@@ -1,6 +1,6 @@
 import { User } from '../Entities/User';
 import express, { Request, Response } from 'express';
-import { createQueryBuilder } from 'typeorm';
+import { createQueryBuilder, getRepository } from 'typeorm';
 import { validateToken } from '../Middlewares/AuthMiddleware';
 import bcrypt from 'bcryptjs';
 
@@ -17,7 +17,7 @@ router.put(
 			oldPassword,
 			newPassword,
 			googleId,
-			languageToBackend,
+			languageToBackend
 		} = req.body;
 		const userId = req.user.id;
 
@@ -40,34 +40,46 @@ router.put(
 						async (hashError, hashedPassword) => {
 							if (hashError) {
 								console.log(hashError);
-								res.json({ error: hashError });
+								res.status(400).json({ error: hashError });
 							}
 
-							const updatedUser = await createQueryBuilder()
-								.update(User)
-								.set({
-									username: newUsername,
-									password: hashedPassword,
-								})
-								.where('id = :userId', { userId: userId })
-								.execute();
+							try {
+								const updatedUser = await createQueryBuilder()
+									.update(User)
+									.set({
+										username: newUsername,
+										password: hashedPassword
+									})
+									.where('id = :userId', { userId: userId })
+									.execute();
 
-							if (!updatedUser) {
-								console.log(
-									'Something went wrong with the update!'
-								);
+								if (!updatedUser) {
+									console.log(
+										'Something went wrong with the update!'
+									);
+									res.status(400).json({
+										error:
+											languageToBackend === 'EN'
+												? 'There was an error with the update, please try again!'
+												: 'Hiba adódott a szerkesztéssel, kérjük próbáld újra!'
+									});
+								} else {
+									res.status(200).json({
+										successMessage:
+											languageToBackend === 'EN'
+												? 'Updated profile datas!'
+												: 'Profil adatok frissítve!',
+										updatedUsername: newUsername
+									});
+								}
+							} catch (error) {
+								console.log(error);
+								console.log(error);
 								res.json({
 									error:
 										languageToBackend === 'EN'
-											? 'There was an error with the update, please try again!'
-											: 'Hiba adódott a szerkesztéssel, kérjük próbáld újra!',
-								});
-							} else {
-								res.json({
-									successMessage:
-										languageToBackend === 'EN'
-											? 'Updated profile datas!'
-											: 'Profil adatok frissítve!',
+											? 'Your new username is already taken, please choose another one!'
+											: 'Ez a felhasználónév már foglalt, kérjük válasszon másikat!'
 								});
 							}
 						}
@@ -77,37 +89,50 @@ router.put(
 					oldPassword === '' &&
 					newPassword === ''
 				) {
-					const updatedUser = await createQueryBuilder()
-						.update(User)
-						.set({
-							username: newUsername,
-						})
-						.where('id = :userId', { userId: userId })
-						.execute();
+					try {
+						const updatedUser = await createQueryBuilder()
+							.update(User)
+							.set({
+								username: newUsername
+							})
+							.where('id = :userId', { userId: userId })
+							.execute();
 
-					if (!updatedUser) {
-						console.log('Something went wrong with the update!');
+						if (!updatedUser) {
+							console.log(
+								'Something went wrong with the update!'
+							);
+							res.status(400).json({
+								error:
+									languageToBackend === 'EN'
+										? 'There was an error with the update, please try again!'
+										: 'Hiba adódott a szerkesztéssel, kérjük próbáld újra!'
+							});
+						} else {
+							res.status(200).json({
+								successMessage:
+									languageToBackend === 'EN'
+										? 'Username updated successfully!'
+										: 'Felhasználónév frissítve!',
+								updatedUsername: newUsername
+							});
+						}
+					} catch (error) {
+						console.log(error);
 						res.json({
 							error:
 								languageToBackend === 'EN'
-									? 'There was an error with the update, please try again!'
-									: 'Hiba adódott a szerkesztéssel, kérjük próbáld újra!',
-						});
-					} else {
-						res.json({
-							successMessage:
-								languageToBackend === 'EN'
-									? 'Username updated successfully!'
-									: 'Felhasználónév frissítve!',
+									? 'Your new username is already taken, please choose another one!'
+									: 'Ez a felhasználónév már foglalt, kérjük válasszon másikat!'
 						});
 					}
 				} else if (newUsername === '') {
 					if (oldPassword === '' || newPassword === '') {
-						res.json({
+						res.status(400).json({
 							error:
 								languageToBackend === 'EN'
 									? 'You have to fill both old password and new password fields!'
-									: 'Mindkét jelszó mező kitöltése kötelező!',
+									: 'Mindkét jelszó mező kitöltése kötelező!'
 						});
 					} else {
 						bcrypt.compare(
@@ -115,11 +140,11 @@ router.put(
 							getUserByUsername.password,
 							(comparePasswordError, comparePasswordResult) => {
 								if (!comparePasswordResult) {
-									res.json({
+									res.status(400).json({
 										error:
 											languageToBackend === 'EN'
 												? 'Wrong old password!'
-												: 'Hibás régi jelszó!',
+												: 'Hibás régi jelszó!'
 									});
 								} else if (comparePasswordResult) {
 									bcrypt.hash(
@@ -128,16 +153,18 @@ router.put(
 										async (hashError, hashedPassword) => {
 											if (hashError) {
 												console.log(hashError);
-												res.json({ error: hashError });
+												res
+													.status(400)
+													.json({ error: hashError });
 											}
 
 											const updatedUser = await createQueryBuilder()
 												.update(User)
 												.set({
-													password: hashedPassword,
+													password: hashedPassword
 												})
 												.where('id = :userId', {
-													userId: userId,
+													userId: userId
 												})
 												.execute();
 
@@ -145,20 +172,20 @@ router.put(
 												console.log(
 													'There was an error with the password update!'
 												);
-												res.json({
+												res.status(400).json({
 													error:
 														languageToBackend ===
 														'EN'
 															? 'There was an error with the update, please try again!'
-															: 'Hiba adódott a szerkesztéssel, kérjük próbáld újra!',
+															: 'Hiba adódott a szerkesztéssel, kérjük próbáld újra!'
 												});
 											} else {
-												res.json({
+												res.status(200).json({
 													successMessage:
 														languageToBackend ===
 														'EN'
 															? 'Password updated successfully!'
-															: 'Jelszó frissítve!',
+															: 'Jelszó frissítve!'
 												});
 											}
 										}
@@ -170,11 +197,11 @@ router.put(
 				}
 			}
 		} else {
-			res.json({
+			res.status(400).json({
 				error:
 					languageToBackend === 'EN'
 						? 'You are not able to edit Google credentials!'
-						: 'Nincs jogosultságod szerkeszteni a Google adatokat!',
+						: 'Nincs jogosultságod szerkeszteni a Google adatokat!'
 			});
 		}
 	}

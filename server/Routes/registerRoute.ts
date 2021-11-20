@@ -65,7 +65,7 @@ router.post('/api/register', async (req: Request, res: Response) => {
 				success: false,
 			});
 		} else {
-			bcrypt.hash(password, saltRounds, (hashError, hashedPassword) => {
+			bcrypt.hash(password, saltRounds, async (hashError, hashedPassword) => {
 				if (hashError) {
 					console.log(hashError);
 					res.json(hashError);
@@ -76,7 +76,7 @@ router.post('/api/register', async (req: Request, res: Response) => {
 					password: hashedPassword,
 				});
 
-                newUser.save();
+                await newUser.save();
 
 				if (!newUser) {
 					console.log('There was an error with the user creation!');

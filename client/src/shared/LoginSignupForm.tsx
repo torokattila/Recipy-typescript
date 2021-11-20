@@ -3,12 +3,13 @@ import { useHistory } from 'react-router-dom';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { AuthContext } from '../helpers/AuthContext';
 import IconButton from '@material-ui/core/IconButton';
-import { GoogleLogin, GoogleLoginResponse } from 'react-google-login';
+import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import '../components/Login.css';
 import SignupContainer from '../containers/SignupContainer';
 import LoginContainer from '../containers/LoginContainer';
 import PageLanguage from '../enums/PageLanguage';
-import { Divider } from '@material-ui/core';
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 type LoginSignupFormProps = {
 	pageName: string;
@@ -33,7 +34,9 @@ const LoginSignupForm = ({ pageName }: LoginSignupFormProps): JSX.Element => {
 		loginGoogle,
 		hidePassword,
 		togglePasswordIcon,
-		handleChangeLanguage
+		handleChangeLanguage,
+		isGoogleLoginFailed,
+		googleLoginError,
 	} = LoginContainer();
 
 	return (
@@ -49,7 +52,7 @@ const LoginSignupForm = ({ pageName }: LoginSignupFormProps): JSX.Element => {
 				<div>
 					<IconButton
 						onClick={() => {
-							handleChangeLanguage(PageLanguage.EN);
+							handleChangeLanguage(PageLanguage.HU);
 						}}
 					>
 						<img src="/hu.png" className="flag-icon" />
@@ -57,7 +60,7 @@ const LoginSignupForm = ({ pageName }: LoginSignupFormProps): JSX.Element => {
 
 					<IconButton
 						onClick={() => {
-							handleChangeLanguage(PageLanguage.HU);
+							handleChangeLanguage(PageLanguage.EN);
 						}}
 					>
 						<img src="/uk.jpg" className="flag-icon" />
@@ -179,7 +182,11 @@ const LoginSignupForm = ({ pageName }: LoginSignupFormProps): JSX.Element => {
 										: 'Bejelentkezés'
 								}
 								onSuccess={loginGoogle}
-								onFailure={loginGoogle}
+								onFailure={(response: GoogleLoginResponseOffline) => {
+									if (isGoogleLoginFailed) {
+										toast.error(googleLoginError, { theme: 'colored' });
+									}
+								}}
 								cookiePolicy={'single_host_origin'}
 							/>
 						</div>}
@@ -221,6 +228,18 @@ const LoginSignupForm = ({ pageName }: LoginSignupFormProps): JSX.Element => {
 							</span>
 						</div>}
 			</div>
+
+			<ToastContainer
+				position="top-right"
+				autoClose={2500}
+				hideProgressBar={true}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+			/>
 		</div>
 	);
 };

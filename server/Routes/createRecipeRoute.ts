@@ -19,19 +19,26 @@ router.post(
 				error:
 					languageToBackend === 'EN'
 						? 'Add a title to your recipe!'
-						: 'Adj meg egy címet vagy nevet a receptednek!',
+						: 'Adj meg egy címet vagy nevet a receptednek!'
 			});
 		} else {
-            const user = await User.findOne(userId);
+			const user = await User.findOne(userId);
 
-            const newRecipe = Recipe.create({
-                title,
-                content: preparation,
-                user: user
-            });
+			const newRecipe = Recipe.create({
+				title,
+				content: preparation,
+				user: user
+			});
 
-            await newRecipe.save();
-        }
+			await newRecipe.save();
+			res
+				.status(201)
+				.json(
+					languageToBackend === 'EN'
+						? 'Recipe created!'
+						: 'Recept hozzáadva!'
+				);
+		}
 	}
 );
 

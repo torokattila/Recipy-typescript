@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { AuthContext } from "../helpers/AuthContext";
 import { useHistory } from 'react-router-dom';
-import Swal from "sweetalert2";
+import Swal, { SweetAlertResult } from 'sweetalert2';
 import PageLanguage from '../enums/PageLanguage';
 
-function NavbarContainer() {
+const NavbarContainer = () => {
     const { setAuthState, pageLanguage } = useContext(AuthContext);
     const history = useHistory();
 
@@ -15,7 +15,7 @@ function NavbarContainer() {
             showCancelButton: true,
             cancelButtonText: pageLanguage === PageLanguage.EN ? 'Cancel' : 'Mégse'
         })
-        .then((response: any) => {
+        .then((response: SweetAlertResult) => {
             if (response.value) {
                 localStorage.removeItem('accessToken');
                 setAuthState({

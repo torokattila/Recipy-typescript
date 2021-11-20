@@ -13,25 +13,27 @@ router.delete(
 		const { languageToBackend } = req.body;
 
 		const deletedRecipe = await createQueryBuilder()
-        .delete()
-        .from(Recipe)
-        .where('id = :recipeId', { recipeId: Number(recipeId) })
-        .execute();
+			.delete()
+			.from(Recipe)
+			.where('id = :recipeId', { recipeId: Number(recipeId) })
+			.execute();
 
 		if (!deletedRecipe) {
 			console.log('Delete recipe failed!');
-			res.json({
+			res.status(400).json({
 				error:
 					languageToBackend === 'EN'
 						? 'There was an error with the delete, please try again!'
-						: 'Hiba adódott a törléssel, kérjük próbálja újra!',
+						: 'Hiba adódott a törléssel, kérjük próbálja újra!'
 			});
 		} else {
-			res.json(
-				languageToBackend === 'EN'
-					? 'Recipe deleted!'
-					: 'Recept törölve!'
-			);
+			res
+				.status(200)
+				.json(
+					languageToBackend === 'EN'
+						? 'Recipe deleted!'
+						: 'Recept törölve!'
+				);
 		}
 	}
 );

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import HomeContainer from '../containers/HomeContainer';
 import PageLanguage from '../enums/PageLanguage';
 import { AuthContext } from '../helpers/AuthContext';
@@ -8,7 +8,9 @@ import Navbar from '../shared/Navbar';
 import PopupModal from './PopupModal';
 import RecipeCard from './RecipeCard';
 
-import "./Home.css";
+import './Home.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Home(): JSX.Element {
 	const {
@@ -24,10 +26,14 @@ function Home(): JSX.Element {
 		handleDeleteRecipe,
 		modalRecipeTitle,
 		modalRecipeContent,
-		handleGetRandomRecipe
+		handleGetRandomRecipe,
+		getUserRecipes
 	} = HomeContainer();
-
 	const { authState, pageLanguage } = useContext(AuthContext);
+
+	useEffect(() => {
+		getUserRecipes();
+	}, []);
 
 	return (
 		<div>
@@ -121,6 +127,17 @@ function Home(): JSX.Element {
 					</button>
 				</Tooltip>
 			</div>
+			<ToastContainer
+				position="top-right"
+				autoClose={2500}
+				hideProgressBar={true}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+			/>
 		</div>
 	);
 }

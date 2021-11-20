@@ -15,6 +15,7 @@ router.get(
 			.select('recipe')
 			.from(Recipe, 'recipe')
 			.where('recipe.user_id = :userId', { userId: userId })
+			.orderBy('recipe.created_at', 'DESC')
 			.getMany();
 
 		const listOfRecipies = JSON.parse(JSON.stringify(userRecipes));

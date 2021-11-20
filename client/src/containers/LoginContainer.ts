@@ -1,10 +1,10 @@
 import { useState, useContext } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import Swal from "sweetalert2";
 import { AuthContext } from "../helpers/AuthContext";
 import { useHistory } from 'react-router-dom';
 import PageLanguage from '../enums/PageLanguage';
-import { GoogleLoginResponse, GoogleLoginResponseOffline, UseGoogleLoginResponse } from 'react-google-login';
+import { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
+import { toast } from 'react-toastify';
 
 type LoginDataType = {
     username: string;
@@ -23,6 +23,8 @@ const LoginContainer = () => {
     const [loginPassword, setLoginPassword] = useState<string>('');
     const [hidePassword, setHidePassword] = useState<boolean>(true);
     const [isPassword, setIsPassword] = useState<boolean>(true);
+    const [isGoogleLoginFailed, setIsGoogleLoginFailed] = useState<boolean>(false);
+    const [googleLoginError, setGoogleLoginError] = useState<string>('');
 
     const { setAuthState, pageLanguage } = useContext(AuthContext);
     const history = useHistory();
@@ -47,11 +49,7 @@ const LoginContainer = () => {
         axios.post('http://localhost:3001/api/login', data)
         .then((response: AxiosResponse) => {
             if (response.data.error) {
-                Swal.fire({
-                    title: '',
-                    text: response.data.error,
-                    type: 'error'
-                });
+                toast.error(response.data.error, { theme: 'colored' });
             } else {
                 localStorage.setItem('accessToken', response.data.token);
 
@@ -71,7 +69,6 @@ const LoginContainer = () => {
     };
 
     const loginGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffline): void => {
-        
         const data: GoogleLoginDataType= {
                 username: 'profileObj' in response ? response?.profileObj.givenName : '',
                 google_id: 'profileObj' in response ? response.profileObj.googleId : '',
@@ -81,11 +78,9 @@ const LoginContainer = () => {
         axios.post('http://localhost:3001/api/login', data)
         .then((response: AxiosResponse) => {
             if (response.data.error) {
-                Swal.fire({
-                    title: '',
-                    text: response.data.error,
-                    type: 'error'
-                });
+                setIsGoogleLoginFailed(true);
+                setGoogleLoginError(response.data.error);
+                
             } else {
                 localStorage.setItem('accessToken', response.data.token);
                 
@@ -116,7 +111,9 @@ const LoginContainer = () => {
 		hidePassword,
 		setHidePassword,
 		togglePasswordIcon,
-		handleChangeLanguage
+		handleChangeLanguage,
+        isGoogleLoginFailed,
+        googleLoginError
 	};
 }
 
